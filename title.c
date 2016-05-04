@@ -247,12 +247,12 @@ void do_title()
     switch (title_page) 
     {
     case 0:
-	center_text("Copyright (c) 1995-1998   Joe Rumsey", ty, W_Green); ty+= W_Textheight;
-	center_text("Maintenance 2008 by Hermann Riedel", ty, W_Green); ty+= 2*W_Textheight;
+//	center_text("Copyright (c) 1995-1998   Joe Rumsey", ty, W_Green); ty+= W_Textheight;
+	center_text("Hi Brendan", ty, W_Green); ty+= 2*W_Textheight;
 #ifndef ORIGINAL_XGALAGA
 	center_text("XGalaga: Hyperspace 0.9", ty, W_Green); ty+= W_Textheight;
 #endif
-        show_help();
+        //show_help();
 //        show_credits();
 	break;
     case 1:
@@ -263,12 +263,13 @@ void do_title()
     }
 
 #ifdef __linux__
-    if (js_device)
-	    center_text("Press k for keyboard or joystick control, m for mouse", WINHEIGHT - 2*W_Textheight, W_Yellow);
-    else /* no joystick, so use message below */
+    if (js_device){
+	    //center_text("Press k for keyboard or joystick control, m for mouse", WINHEIGHT - 2*W_Textheight, W_Yellow);
+    }else{ /* no joystick, so use message below */
 #endif
     center_text("Press k for keyboard control, m for mouse", WINHEIGHT - 2*W_Textheight, W_Yellow);
-    center_text("Or q to quit", WINHEIGHT - W_Textheight, W_Yellow);
+    }
+ 	center_text("Or q to quit", WINHEIGHT - W_Textheight, W_Yellow);
 
     undo_credits();     // erase with painting black
     pagetimer--;
@@ -288,7 +289,7 @@ void do_title()
 	  title_page = 0;
 	pagetimer = 299;
     }
-    show_credits();     // write text
+    //show_credits();     // write text
 }
 
 void init_titles()
