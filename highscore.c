@@ -40,8 +40,15 @@
 #endif
 #define NUM_MY_SCORES 10
 
+#define MAX_PHONE 12
+#define MAX_EMAIL 50
+
 static char new_name[20];
-static int nnpos=0;
+static char new_phone[MAX_PHONE];
+static char new_email[MAX_EMAIL];
+static int nnpos     = 0;
+static int phonepos  = 0;
+static int emailpos  = 0;
 static int thisplace = -1, my_thisplace = -1;
 
 static struct high_score {
@@ -51,36 +58,53 @@ static struct high_score {
     char name[20];
     long score;
     long level;
+    char email[MAX_EMAIL];
+    char phone[MAX_PHONE];
 } 
+
 #ifndef NO_GLOBAL_SCORES
 	global_scores[NUM_GLOBAL_SCORES],
 #endif
 	my_scores[NUM_MY_SCORES];
 
-void undo_name()
-{
+void undo_name() {
     W_ClearArea(baseWin, 
 		WINWIDTH/2-(20*W_Textwidth), 250,
 		(40*W_Textwidth), W_Textheight*2);
 }
 
-void do_name()
-{
+void do_name() {
     char buf[21];
     static int init = 0;
 
     if(!init) {
-	strcpy(new_name, getUsersFullName());
-	nnpos = strlen(new_name);
-	init = 1;
+		strcpy(new_name, getUsersFullName());
+		nnpos = strlen(new_name);
+		init = 1;
     }
     center_text("Great score! Enter your name:", 250, W_Red);
     sprintf(buf, "%s_", new_name);
     center_text(buf, 250 + W_Textheight, W_Cyan);
 }
 
-char *getUsersFullName()
-{
+
+void do_phone() {
+    char buf[MAX_PHONE];
+	nnpos = strlen(new_name);
+    center_text("enter your email:", 250, W_Red);
+    sprintf(buf, "%s_", new_name);
+    center_text(buf, 250 + W_Textheight, W_Cyan);
+}
+
+void do_email() {
+    char buf[MAX_EMAIL];
+	nnpos = strlen(new_name);
+    center_text("enter your phone:", 250, W_Red);
+    sprintf(buf, "%s_", new_name);
+    center_text(buf, 250 + W_Textheight, W_Cyan);
+}
+
+char *getUsersFullName() {
     struct passwd *pass;
     char *comma;
     char *cp1, *cp2;
@@ -131,8 +155,41 @@ char *getUsersFullName()
     return(fullname);
 }
 
-static void save_scores()
-{
+static void save_scores_new() {
+	int i, hsf;
+    long x;
+    char my_file_name [256], *home;
+	if((home = getenv("HOME"))) {
+		snprintf(my_file_name, sizeof(my_file_name)-1, "%s/.xgalscores", home);
+		hsf = open(my_file_name, O_WRONLY | O_TRUNC | O_CREAT, 0644);
+		if(hsf < 0) {
+		    printf("Couldn't write scores file %s\n", my_file_name);
+		    return;
+		}
+		for(i=0;i<NUM_MY_SCORES;i++) {
+		    if(write(hsf, my_scores[i].name, 20) < 20)
+				goto error2;
+		    
+		    x=htonl(my_scores[i].score);
+		    if(write(hsf, &x, sizeof(long)) < sizeof(long))
+				goto error2;
+		    
+		    x=htonl(my_scores[i].level);
+		    if(write(hsf, &x, sizeof(long)) < sizeof(long))
+				goto error2;
+	}
+        close(hsf);
+    }
+	
+    return;
+
+  error2:
+    printf("Error saving high scores file %s\n", my_file_name);
+    return;
+
+}
+
+static void save_scores() {
     int i;
     int hsf;
     long x;
@@ -140,30 +197,33 @@ static void save_scores()
 #ifndef NO_GLOBAL_SCORES
     hsf = open(SCOREFILE, O_WRONLY | O_TRUNC | O_CREAT, 0666);
     if(hsf < 0) {
-	printf("Couldn't write scores file %s\n", SCOREFILE);
-	return;
+		printf("Couldn't write scores file %s\n", SCOREFILE);
+		return;
     }
 
     for(i=0;i<NUM_GLOBAL_SCORES;i++) {
 #ifdef NOSCOREHOGS
         x=htonl(global_scores[i].uid);
-	if(write(hsf, &x, sizeof(long)) < sizeof(long))
-	    goto error;
+		if(write(hsf, &x, sizeof(long)) < sizeof(long))
+	    	goto error;
 #endif
-	if(write(hsf, global_scores[i].name, 20) < 20)
-	    goto error;
-	x=htonl(global_scores[i].score);
-	if(write(hsf, &x, sizeof(long)) < sizeof(long))
-	    goto error;
-	x=htonl(global_scores[i].level);
-	if(write(hsf, &x, sizeof(long)) < sizeof(long))
-	    goto error;
+		if(write(hsf, global_scores[i].name, 20) < 20)
+	    	goto error;
+		x=htonl(global_scores[i].score);
+	
+		if(write(hsf, &x, sizeof(long)) < sizeof(long))
+	    	goto error;
+	
+		x=htonl(global_scores[i].level);
+		if(write(hsf, &x, sizeof(long)) < sizeof(long))
+	    	goto error;
     }
+
     close(hsf);
 #endif /* NO_GLOBAL_SCORES */
     if((home = getenv("HOME"))) {
 #ifndef NO_GLOBAL_SCORES
-	gid_t my_egid = getegid();
+		gid_t my_egid = getegid();
 	if (setgid(getgid()) != 0) {
 		perror("setgid");
 		return;
@@ -183,13 +243,15 @@ static void save_scores()
 	}
 	for(i=0;i<NUM_MY_SCORES;i++) {
 	    if(write(hsf, my_scores[i].name, 20) < 20)
-		goto error2;
+			goto error2;
+	    
 	    x=htonl(my_scores[i].score);
 	    if(write(hsf, &x, sizeof(long)) < sizeof(long))
-		goto error2;
+			goto error2;
+	    
 	    x=htonl(my_scores[i].level);
 	    if(write(hsf, &x, sizeof(long)) < sizeof(long))
-		goto error2;
+			goto error2;
 	}
         close(hsf);
     }
@@ -205,12 +267,9 @@ static void save_scores()
     return;
 }
 
-void add_score(char *name, int score)
-{
+void add_score(char *name, int score) {
     int i,j ; /* ,k; */
-
     thisplace = my_thisplace = -1;
-
     load_scores();
 
 #ifndef NO_GLOBAL_SCORES
@@ -219,110 +278,199 @@ void add_score(char *name, int score)
      * by uid (getuid)
      */
     for(i=0;i<NUM_GLOBAL_SCORES;i++) {
-	if(score > global_scores[i].score) {
-	    /* /lib 27jul95 uniq-global-highscore: */
-	    /* find old position of high-score: */
-	    for(k=i;k<NUM_GLOBAL_SCORES;k++) {
-		if(global_scores[k].uid == getuid()) {
+		if(score > global_scores[i].score) {
+		    /* /lib 27jul95 uniq-global-highscore: */
+		    /* find old position of high-score: */
+		    for(k=i;k<NUM_GLOBAL_SCORES;k++) {
+				if(global_scores[k].uid == getuid()) {
+				    break;
+				}
+		    }
+		    if(k==NUM_GLOBAL_SCORES) {
+				k--;
+		    }
+		    /* found old pos, copy from i..k-1 to i+1..k */
+		    for(j=k;j>i;j--) {
+				global_scores[j].uid = global_scores[j-1].uid;
+				strcpy(global_scores[j].name, global_scores[j-1].name);
+				global_scores[j].score = global_scores[j-1].score;
+				global_scores[j].level = global_scores[j-1].level;
+		    }
+		    global_scores[i].uid = getuid();
+		    strcpy(global_scores[i].name, name);
+		    global_scores[i].score = score;
+		    global_scores[i].level = level;
+		    thisplace = i;
 		    break;
 		}
-	    }
-	    if(k==NUM_GLOBAL_SCORES) {
-		k--;
-	    }
-	    /* found old pos, copy from i..k-1 to i+1..k */
-	    for(j=k;j>i;j--) {
-		global_scores[j].uid = global_scores[j-1].uid;
-		strcpy(global_scores[j].name, global_scores[j-1].name);
-		global_scores[j].score = global_scores[j-1].score;
-		global_scores[j].level = global_scores[j-1].level;
-	    }
-	    global_scores[i].uid = getuid();
-	    strcpy(global_scores[i].name, name);
-	    global_scores[i].score = score;
-	    global_scores[i].level = level;
-	    thisplace = i;
-	    break;
-	}
-	/* high-score stuff by /lib (uid is found, score is too low): */
-	else if(global_scores[i].uid == getuid()) {
-	    break;
-	}
+		/* high-score stuff by /lib (uid is found, score is too low): */
+		else if(global_scores[i].uid == getuid()) {
+		    break;
+		}
     }
 
 #else /* NOSCOREHOGS */
     for(i=0;i<NUM_GLOBAL_SCORES;i++) {
-	if(score > global_scores[i].score) {
-	    for(j=NUM_GLOBAL_SCORES-1;j>i;j--) {
-		strcpy(global_scores[j].name, global_scores[j-1].name);
-		global_scores[j].score = global_scores[j-1].score;
-		global_scores[j].level = global_scores[j-1].level;
-	    }
-	    strcpy(global_scores[i].name, name);
-	    global_scores[i].score = score;
-	    global_scores[i].level = level;
-	    thisplace = i;
-	    break;
-	}
+		if(score > global_scores[i].score) {
+		    for(j=NUM_GLOBAL_SCORES-1;j>i;j--) {
+			strcpy(global_scores[j].name, global_scores[j-1].name);
+			global_scores[j].score = global_scores[j-1].score;
+			global_scores[j].level = global_scores[j-1].level;
+		    }
+		    strcpy(global_scores[i].name, name);
+		    global_scores[i].score = score;
+		    global_scores[i].level = level;
+		    thisplace = i;
+		    break;
+		}
     }
 #endif /* NOSCOREHOGS */
 #endif /* NO_GLOBAL_SCORES */
 
     for(i=0;i<NUM_MY_SCORES;i++) {
-	if(score > my_scores[i].score) {
-	    for(j=NUM_MY_SCORES-1;j>i;j--) {
-		strcpy(my_scores[j].name, my_scores[j-1].name);
-		my_scores[j].score = my_scores[j-1].score;
-		my_scores[j].level = my_scores[j-1].level;
-	    }
-	    strcpy(my_scores[i].name, name);
-	    my_scores[i].score = score;
-	    my_scores[i].level = level;
-	    my_thisplace = i;
-	    break;
-	}
+		if(score > my_scores[i].score) {
+		    for(j=NUM_MY_SCORES-1;j>i;j--) {
+			strcpy(my_scores[j].name, my_scores[j-1].name);
+			my_scores[j].score = my_scores[j-1].score;
+			my_scores[j].level = my_scores[j-1].level;
+		    }
+		    strcpy(my_scores[i].name, name);
+		    my_scores[i].score = score;
+		    my_scores[i].level = level;
+		    my_thisplace = i;
+		    break;
+		}
     }
     save_scores();
 }
 
-int score_key(W_Event *ev)
-{
-    if(getting_name) {
-	switch(ev->key) {
-	  case 13:
-	  case 10:
-          case 269:
-	    getting_name = 0;
-	    add_score(new_name, score);
-	    title_page = 1;
-	    pagetimer = 300;
-	    W_ClearWindow(baseWin);
-	    break;
-	  case 8:
-	  case 127:
-          case 264:
-	    if(nnpos > 0) {
-		nnpos--;
-		new_name[nnpos] = 0;
-	    }
-	    break;
-	  case 'u'+128:
-	    nnpos = 0;
-	    new_name[nnpos] = 0;
-	    break;
-	  default:
-	    if(nnpos < 19) {
-		new_name[nnpos++] = ev->key;
-		new_name[nnpos] = 0;
-	    }
-	    break;
-	}
+int add_total_highscore(char *name, int score, char *mail, char *phone){
+	for(i=0;i<NUM_MY_SCORES;i++) {
+		if(score > my_scores[i].score) {
+		    for(j=NUM_MY_SCORES-1;j>i;j--) {
+				strcpy(my_scores[j].name,   my_scores[j-1].name);
+				strcpy(my_scores[j].email,  my_scores[j-1].email);
+				strcpy(my_scores[j].phone,  my_scores[j-1].phone);
+				my_scores[j].score = my_scores[j-1].score;
+				my_scores[j].level = my_scores[j-1].level;
+		    }
 
-	return 1;
+		    strcpy(my_scores[i].name,  name);
+		    strcpy(my_scores[i].email, email);
+			strcpy(my_scores[i].phone, phone);
+		    my_scores[i].score = score;
+		    my_scores[i].level = level;
+		    my_thisplace = i;
+		    break;
+		}
+    }
+
+}
+
+int score_key(W_Event *ev) {
+    if(getting_name) {
+		switch(ev->key) {
+		  case 13:  //carriage return
+		  case 10:  //line feed
+	      case 269: //no idea
+		    getting_name  = 0;
+		    getting_email = 1;
+		    add_score(new_name, score);
+		    title_page = 1;
+		    pagetimer = 300;
+		    W_ClearWindow(baseWin);
+
+		    break;
+		  case 8:   //backspace
+		  case 127: //delete
+	      case 264: //no idea
+		    if(nnpos > 0) {
+			nnpos--;
+			new_name[nnpos] = 0;
+		    }
+		    break;
+		  case 'u'+128:
+		    nnpos = 0;
+		    new_name[nnpos] = 0;
+		    break;
+		  default:
+		    if(nnpos < 19) {
+				new_name[nnpos++] = ev->key;
+				new_name[nnpos] = 0;
+		    }
+		    break;
+		}
+
+		return 1;
     }
     return 0;
 }
 
+int email_key(W_Event *ev){
+	if(getting_email){
+		switch(ev->key){}
+		//do stuff
+			case 13:
+			case 10:
+			case 269:
+				getting_email = 0;
+				getting_phone = 1;
+				add_score(new_name, score);
+				W_ClearWindow(baseWin);
+			    break;
+			case 8:   //backspace
+			case 127: //delete
+			case 264: //no idea
+				if(nnpos > 0) {
+					nnpos--;
+					new_name[nnpos] = 0;
+				}
+				break;
+			case 'u'+128:
+				nnpos = 0;
+				new_phone[nnpos] = 0;
+				break;
+			default:
+
+				break;
+		}
+
+		return 1;
+    }
+    return 0;
+}
+
+int phone_key(W_Event *ev){
+	if(getting_phone){
+		switch(ev->key){
+			//do stuff
+			case 13:
+			case 10:
+			case 269:
+				getting_phone = 0;
+				add_score(new_name, score);
+				W_ClearWindow(baseWin);
+				break;
+			case 8:   //backspace
+			case 127: //delete
+			case 264: //no idea
+				if(nnpos > 0) { //TODO: change nnpos
+					nnpos--;
+					new_name[nnpos] = 0;
+				}
+				break;
+			default:
+				if(48 <= ev->key && ev->key <= 57 && phonepos <= 10){
+					new_phone[nnpos++] = ev->key;
+					new_phone[nnpos] = 0;
+				}
+				break;
+
+		}
+	}
+	title_page = 1;
+	return 0;
+}
 
 int check_score(int score)
 {
@@ -435,9 +583,9 @@ void load_scores()
 	if(hsf <0 ) {
 	    printf("Trouble opening high scores file '%s'\n", my_file_name);
 	    for(i=0;i<NUM_MY_SCORES;i++) {
-		my_scores[i].name[0]=0;
-		my_scores[i].score = 0;
-		my_scores[i].level = 0;
+			my_scores[i].name[0]=0;
+			my_scores[i].score = 0;
+			my_scores[i].level = 0;
 	    }
 	} else {
 	    for(i=0;i<NUM_MY_SCORES;i++) {
@@ -486,6 +634,71 @@ void load_scores()
     }
     close(hsf);
 }
+
+void load_scores_new() {
+    int i;
+    int hsf;
+    char my_file_name[256], *home;
+
+    if((home = getenv("HOME"))) {
+		snprintf(my_file_name, sizeof(my_file_name)-1, "%s/.xgalscores", home);
+		hsf = open(my_file_name, O_RDONLY);
+		if(hsf <0 ) {
+		    printf("Trouble opening high scores file '%s'\n", my_file_name);
+		    for(i=0;i<NUM_MY_SCORES;i++) {
+			my_scores[i].name[0]  = 0;
+			my_scores[i].email[0] = 0;
+			my_scores[i].phone[0] = 0;
+			my_scores[i].score = 0;
+			my_scores[i].level = 0;
+		    }
+		} else {
+		    for(i=0;i<NUM_MY_SCORES;i++) {
+				if(read(hsf, my_scores[i].name, 20) < 20)
+				    goto error2;
+				
+				if(read(hsf, my_scores[i].email, MAX_EMAIL) < MAX_EMAIL)
+				    goto error2;
+				
+				if(read(hsf, my_scores[i].phone, MAX_PHONE) < MAX_PHONE)
+				    goto error2;
+
+				if(read(hsf, &my_scores[i].score, sizeof(long)) < sizeof(long))
+				    goto error2;
+
+				if(read(hsf, &my_scores[i].level, sizeof(long)) < sizeof(long))
+				    goto error2;
+
+				my_scores[i].score = ntohl(my_scores[i].score);
+				my_scores[i].level = ntohl(my_scores[i].level);
+		    }
+		}
+		close(hsf);
+    } else {
+		printf("No HOME variable, so no personal score file.\n");
+		for(i=0;i<NUM_MY_SCORES;i++) {
+		    my_scores[i].name[0]  = 0;
+		    my_scores[i].email[0] = 0;
+		    my_scores[i].phone[0] = 0;
+		    my_scores[i].score = 0;
+		    my_scores[i].level = 0;
+		}
+    }
+    return;
+ 
+  error2:
+    if(i>0)
+	printf("Error reading high scores file '%s'\n", my_file_name);
+    for(i=0;i<NUM_MY_SCORES;i++) {
+		my_scores[i].name[0]  = 0;
+		my_scores[i].email[0] = 0;
+		my_scores[i].phone[0] = 0;
+		my_scores[i].score = 0;
+		my_scores[i].level = 0;
+    }
+    close(hsf);
+}
+
 
 void print_scores() {
     int i;

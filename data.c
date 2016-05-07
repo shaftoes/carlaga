@@ -26,6 +26,8 @@ int nextBonus;
 
 int gameOver=1;
 int getting_name = 0;
+int getting_email = 0;
+int getting_phone = 0;
 
 int counter;
 

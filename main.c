@@ -823,9 +823,7 @@ static void undo_player()
                      playerShip->width, h);
 }
 
-static void do_player(mx, my, but)
-int mx, my, but;
-{
+static void do_player(int mx, int my, int but){
     static int torpok;
 #ifdef ENABLE_MACHINE_GUN
     static int shotside = 0;
@@ -837,88 +835,93 @@ int mx, my, but;
         while(W_EventsPending()) {
             W_NextEvent(&wev);
         
-	    if(gameOver)
-	      mouseControl = 1;
+    	    if(gameOver)
+    	      mouseControl = 1;
 
-            switch(wev.type) {
-            case W_EV_KEY:
-                if(score_key(&wev))
-                    continue;
-                switch(wev.key) {
-                case 'q':
-                case 'Q':
-                case 256+'Q':   //369:
-                case 256+'q':   //337:
-                    xgal_exit(0);
-                    break;
-                case 'm':
-                case 256+'m':    //365:
-                    mouseControl = 2;
-                    break;
-                 case 'k':
-                 case 256+'k':   //363:
-                     mouseControl = 0;
-                     W_UngrabPointer();
-                     break;
-                case '\r'+256:
-                    W_ToggleFullscreen(shellWin);
-                    fullscreen = !fullscreen;
-                    if (fullscreen)
-                        W_BlankCursor(baseWin);
-                    else
-                        W_RevertCursor(baseWin);
-                    return;
-                    break;
-#ifdef SOUND
-                case 's':       /* toggle sound on the title screen */
-                case 256+'s':
-                    playSounds = !playSounds;
-                    return;     /* this key must not start the game */
-                    break;
-#endif
-		default:
-/*printf ("1keyevent %d\n", wev.key); */
-                    return;     /* unhandled key must not cause any action */
-		    break;
+                switch(wev.type) {
+                    case W_EV_KEY:
+                        if(score_key(&wev))
+                            continue;
+                        if(email_key(&wev))
+                            continue;
+                        if(phone_key(&wev))
+                            continue;
+                        switch(wev.key) {
+                            case 'q':
+                            case 'Q':
+                            case 256+'Q':   //369:
+                            case 256+'q':   //337:
+                                xgal_exit(0);
+                                break;
+                            case 'm':
+                            case 256+'m':    //365:
+                                mouseControl = 2;
+                                break;
+                             case 'k':
+                             case 256+'k':   //363:
+                                 mouseControl = 0;
+                                 W_UngrabPointer();
+                                 break;
+                            case '\r'+256:
+                                W_ToggleFullscreen(shellWin);
+                                fullscreen = !fullscreen;
+                                if (fullscreen)
+                                    W_BlankCursor(baseWin);
+                                else
+                                    W_RevertCursor(baseWin);
+                                return;
+                                break;
+    #ifdef SOUND
+                            case 's':       /* toggle sound on the title screen */
+                            case 256+'s':
+                                playSounds = !playSounds;
+                                return;     /* this key must not start the game */
+                                break;
+    #endif
+            		        default:
+            /*printf ("1keyevent %d\n", wev.key); */
+                                return;     /* unhandled key must not cause any action */
+            		            break;
+                        }
+                        if(mouseControl < 2)
+                            mouseControl = 0;	
+
+                    case W_EV_BUTTON:
+                        if(!getting_name) {
+                            if(mouseControl)
+                                W_GrabPointer(baseWin);
+                            gameOver = 0;
+                            maxtorps = MINTORPS;
+                            weapon = 0;
+                            movespeed = MINSPEED;
+                            ships=2;
+    #ifdef ACTIVATED_SHIELD
+    		                shieldsleft = STARTSHIELDS;
+    		                shieldon = 0;
+    #else
+    		                shieldsleft = 0;
+    #endif
+                            level=startLevel;  /* change made here */
+                            init_aliens(level);
+                            gotlemon = 0;
+                            pldead = 0;
+                            score = 0;
+                            nextBonus = 20000;
+                            plx = WINWIDTH/2;
+                            W_ClearWindow(baseWin);
+                        }
+                        break;
+                    case W_EV_EXPOSE:
+            	    	if (wev.Window == shellWin)
+            		      draw_score();
+            		    break;
+                    default:
+                        /*printf ("2keyevent %d\n", wev.key);*/
+                        break;
                 }
-                if(mouseControl < 2)
-                    mouseControl = 0;		
-            case W_EV_BUTTON:
-                if(!getting_name) {
-                    if(mouseControl)
-                        W_GrabPointer(baseWin);
-                    gameOver = 0;
-                    maxtorps = MINTORPS;
-                    weapon = 0;
-                    movespeed = MINSPEED;
-                    ships=2;
-#ifdef ACTIVATED_SHIELD
-		    shieldsleft = STARTSHIELDS;
-		    shieldon = 0;
-#else
-		    shieldsleft = 0;
-#endif
-                    level=startLevel;  /* change made here */
-                    init_aliens(level);
-                    gotlemon = 0;
-                    pldead = 0;
-                    score = 0;
-                    nextBonus = 20000;
-                    plx = WINWIDTH/2;
-                    W_ClearWindow(baseWin);
-                }
-                break;
-            case W_EV_EXPOSE:
-	    	if (wev.Window == shellWin)
-		    draw_score();
-		break;
-            default:
-/*printf ("2keyevent %d\n", wev.key);*/
-              break;
             }
+            return;
         }
-        return;
-    }
 
     while(W_EventsPending()) {
         W_NextEvent(&wev);
@@ -1352,9 +1355,9 @@ char  **argv;
 
     W_SetImageDir(IMAGEDIR);
 
-    playerShip = getImage(I_PLAYER1);
-    playerTorp = getImage(I_MTORP);
-    enemyTorp = getImage(I_ETORP);
+    playerShip  = getImage(I_PLAYER1);
+    playerTorp  = getImage(I_MTORP);
+    enemyTorp   = getImage(I_ETORP);
     shieldImage = getImage(I_SHIELD);
 
     level=startLevel;   /* change made here */
@@ -1397,7 +1400,9 @@ char  **argv;
         undo_etorps();
         undo_aliens();
         undo_player();
-        if(gameOver && getting_name) undo_name();
+        if(gameOver && getting_name)  undo_name();
+        if(gameOver && getting_email) undo_name();
+        if(gameOver && getting_phone) undo_name();
         if(paused) undo_pause();
         undo_score();
 
@@ -1411,7 +1416,13 @@ char  **argv;
         do_explosions();
  	do_stars();
         do_score();
-        if(gameOver) { do_title(); if(getting_name) do_name(); }
+        if(gameOver) { 
+            do_title(); 
+            if(getting_name)  do_name();
+            if(getting_email) do_email();
+            if(getting_phone) do_phone(); 
+        }
+
         if(paused) do_pause();
 
         W_DisplayBuffer(baseWin);

@@ -29,6 +29,8 @@ extern int nextBonus;
 
 extern int gameOver;
 extern int getting_name;
+extern int getting_email;
+extern int getting_phone;
 
 extern int counter;
 
