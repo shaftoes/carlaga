@@ -91,7 +91,7 @@ void do_name() {
 void do_phone() {
     char buf[MAX_PHONE];
 	nnpos = strlen(new_name);
-    center_text("enter your email:", 250, W_Red);
+    center_text("enter your phone:", 250, W_Red);
     sprintf(buf, "%s_", new_name);
     center_text(buf, 250 + W_Textheight, W_Cyan);
 }
@@ -99,7 +99,7 @@ void do_phone() {
 void do_email() {
     char buf[MAX_EMAIL];
 	nnpos = strlen(new_name);
-    center_text("enter your phone:", 250, W_Red);
+    center_text("enter your email:", 250, W_Red);
     sprintf(buf, "%s_", new_name);
     center_text(buf, 250 + W_Textheight, W_Cyan);
 }
@@ -344,7 +344,8 @@ void add_score(char *name, int score) {
     save_scores();
 }
 
-int add_total_highscore(char *name, int score, char *mail, char *phone){
+int add_total_highscore(char *name, int score, char *email, char *phone){
+	int i,j;
 	for(i=0;i<NUM_MY_SCORES;i++) {
 		if(score > my_scores[i].score) {
 		    for(j=NUM_MY_SCORES-1;j>i;j--) {
@@ -374,9 +375,11 @@ int score_key(W_Event *ev) {
 		  case 10:  //line feed
 	      case 269: //no idea
 		    getting_name  = 0;
-		    getting_email = 1;
+//		    getting_email = 1;
+		    getting_phone = 1;
 		    add_score(new_name, score);
-		    title_page = 1;
+		    new_name[0] = '\0';
+		    nnpos = 0;
 		    pagetimer = 300;
 		    W_ClearWindow(baseWin);
 
@@ -408,14 +411,15 @@ int score_key(W_Event *ev) {
 
 int email_key(W_Event *ev){
 	if(getting_email){
-		switch(ev->key){}
+		switch(ev->key){
 		//do stuff
 			case 13:
 			case 10:
 			case 269:
 				getting_email = 0;
-				getting_phone = 1;
-				add_score(new_name, score);
+//				getting_phone = 1;
+				nnpos = 0;
+				new_name[nnpos] = '\0';
 				W_ClearWindow(baseWin);
 			    break;
 			case 8:   //backspace
@@ -428,9 +432,13 @@ int email_key(W_Event *ev){
 				break;
 			case 'u'+128:
 				nnpos = 0;
-				new_phone[nnpos] = 0;
+				new_name[nnpos] = 0;
 				break;
 			default:
+				if(nnpos < 19){
+					new_name[nnpos++] = ev->key;
+					new_name[nnpos]   = 0;
+				}
 
 				break;
 		}
@@ -448,7 +456,9 @@ int phone_key(W_Event *ev){
 			case 10:
 			case 269:
 				getting_phone = 0;
-				add_score(new_name, score);
+				getting_email = 1;
+				new_name[0] = '\0';
+				nnpos = 0;
 				W_ClearWindow(baseWin);
 				break;
 			case 8:   //backspace
@@ -460,15 +470,15 @@ int phone_key(W_Event *ev){
 				}
 				break;
 			default:
-				if(48 <= ev->key && ev->key <= 57 && phonepos <= 10){
-					new_phone[nnpos++] = ev->key;
-					new_phone[nnpos] = 0;
+				if(48 >= ev->key && ev->key <= 57 && phonepos <= 10){
+					new_name[nnpos++] = ev->key;
+					new_name[nnpos] = 0;
 				}
 				break;
 
 		}
+	  return 1;
 	}
-	title_page = 1;
 	return 0;
 }
 

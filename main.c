@@ -845,7 +845,7 @@ static void do_player(int mx, int my, int but){
                         if(email_key(&wev))
                             continue;
                         if(phone_key(&wev))
-                            continue;
+                            break;
                         switch(wev.key) {
                             case 'q':
                             case 'Q':
@@ -887,7 +887,7 @@ static void do_player(int mx, int my, int but){
                             mouseControl = 0;	
 
                     case W_EV_BUTTON:
-                        if(!getting_name) {
+                        if(!getting_name || !getting_email || !getting_phone) {
                             if(mouseControl)
                                 W_GrabPointer(baseWin);
                             gameOver = 0;
@@ -1097,7 +1097,7 @@ static void do_player(int mx, int my, int but){
                 if(ships<=0) {
                     gameOver = 1;
                     W_UngrabPointer();
-                    if(check_score(score)) {
+                    if(check_score(score) && !(getting_phone || getting_email)) {
 #ifdef USE_REAL_NAMES
                         add_score(getUsersFullName(), score);
                         title_page = 1; pagetimer = 300;
