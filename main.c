@@ -842,6 +842,8 @@ static void do_player(int mx, int my, int but){
                     case W_EV_KEY:
                         if(score_key(&wev))
                             continue;
+			if(disclaimer_key(&wev))
+		            continue;
                         if(email_key(&wev))
                             continue;
                         if(phone_key(&wev))
@@ -1401,6 +1403,7 @@ char  **argv;
         undo_aliens();
         undo_player();
         if(gameOver && getting_name)  undo_name();
+        if(gameOver && checking_disc) undo_name();
         if(gameOver && getting_email) undo_name();
         if(gameOver && getting_phone) undo_name();
         if(paused) undo_pause();
@@ -1419,6 +1422,7 @@ char  **argv;
         if(gameOver) { 
             do_title(); 
             if(getting_name)  do_name();
+            if(checking_disc)  do_disclaimer();
             if(getting_email) do_email();
             if(getting_phone) do_phone(); 
         }

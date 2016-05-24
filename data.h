@@ -31,6 +31,7 @@ extern int gameOver;
 extern int getting_name;
 extern int getting_email;
 extern int getting_phone;
+extern int checking_disc;
 
 extern int counter;
 

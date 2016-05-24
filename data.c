@@ -25,10 +25,10 @@ int startLevel=1;       /* default starting level defined here */
 int nextBonus;
 
 int gameOver=1;
-int getting_name = 0;
+int getting_name  = 0;
 int getting_email = 0;
 int getting_phone = 0;
-
+int checking_disc = 0;
 int counter;
 
 int mouseControl = 0;

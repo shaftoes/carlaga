@@ -104,6 +104,14 @@ void do_email() {
     center_text(buf, 250 + W_Textheight, W_Cyan);
 }
 
+void do_disclaimer() {
+    char buf[MAX_EMAIL];
+    nnpos = strlen(new_name);
+    center_text("would you like to enter your information to blah? [Y/N]", 250, W_Red);
+    sprintf(buf, "%s_", new_name);
+    center_text(buf, 250 + W_Textheight, W_Cyan);
+}
+
 char *getUsersFullName() {
     struct passwd *pass;
     char *comma;
@@ -376,7 +384,7 @@ int score_key(W_Event *ev) {
 	      case 269: //no idea
 		    getting_name  = 0;
 //		    getting_email = 1;
-		    getting_phone = 1;
+		    checking_disc = 1;
 		    add_score(new_name, score);
 		    new_name[0] = '\0';
 		    nnpos = 0;
@@ -402,6 +410,51 @@ int score_key(W_Event *ev) {
 				new_name[nnpos] = 0;
 		    }
 		    break;
+		}
+
+		return 1;
+    }
+    return 0;
+}
+
+int disclaimer_key(W_Event *ev){
+	char choice = 0;
+	if(checking_disc){
+		switch(ev->key){
+			case 13:
+                        case 10:
+                        case 269:
+                                choice  = new_name[0];
+                                if(choice == 'y' || choice == 'Y'){
+					getting_phone = 1;
+				        checking_disc = 0;
+				}else if (choice == 'n' || choice == 'N'){
+ 					getting_email = 0;
+					checking_disc =  0; 
+                                }
+				nnpos = 0;
+				new_name[nnpos] = '\0';
+				W_ClearWindow(baseWin);
+			    break;
+			case 8:   //backspace
+			case 127: //delete
+			case 264: //no idea
+				if(nnpos > 0) {
+					nnpos--;
+					new_name[nnpos] = 0;
+				}
+				break;
+			case 'u'+128:
+				nnpos = 0;
+				new_name[nnpos] = 0;
+				break;
+			default:
+				if(nnpos < 1){
+					new_name[nnpos++] = ev->key;
+					new_name[nnpos]   = 0;
+				}
+
+				break;
 		}
 
 		return 1;
@@ -470,7 +523,8 @@ int phone_key(W_Event *ev){
 				}
 				break;
 			default:
-				if(48 >= ev->key && ev->key <= 57 && phonepos <= 10){
+				//if(48 >= ev->key && ev->key <= 57 && phonepos <= 10){
+				if(nnpos < 11){
 					new_name[nnpos++] = ev->key;
 					new_name[nnpos] = 0;
 				}
