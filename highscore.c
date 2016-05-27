@@ -80,7 +80,7 @@ void do_name() {
     static int init = 0;
 
     if(!init) {
-		strcpy(new_name, getUsersFullName());
+		//strcpy(new_name, getUsersFullName());
 		nnpos = strlen(new_name);
 		init = 1;
     }
@@ -109,7 +109,7 @@ void do_email() {
 void do_disclaimer() {
     char buf[MAX_EMAIL];
     nnpos = strlen(new_name);
-    center_text("would you like to enter your information to blah? [Y/N]", 250, W_Red);
+    center_text("would you like to enter your information to be considered for the grand prize?  [Y/N]", 250, W_Red);
     sprintf(buf, "%s_", new_name);
     center_text(buf, 250 + W_Textheight, W_Cyan);
 }
@@ -126,7 +126,14 @@ static void save_scores_new() {
 		    return;
 		}
 		for(i=0;i<NUM_MY_SCORES;i++) {
+		    
 		    if(write(hsf, my_scores[i].name, MAX_NAME) < MAX_NAME)
+				goto error2;
+		    
+		    if(write(hsf, my_scores[i].email, MAX_EMAIL) < MAX_EMAIL)
+				goto error2;
+		    
+		   if(write(hsf, my_scores[i].phone, MAX_PHONE) < MAX_PHONE)
 				goto error2;
 		    
 		    x=htonl(my_scores[i].score);
@@ -136,7 +143,7 @@ static void save_scores_new() {
 		    x=htonl(my_scores[i].level);
 		    if(write(hsf, &x, sizeof(long)) < sizeof(long))
 				goto error2;
-		}
+			}
         close(hsf);
     }
 	
@@ -148,7 +155,7 @@ static void save_scores_new() {
 
 }
 
-int add_total_highscore(char *name, int score, char *email, char *phone){
+int add_total_highscore(){
 	int i,j;
 	for(i=0;i<NUM_MY_SCORES;i++) {
 		if(cur_score.score > my_scores[i].score) {
@@ -182,7 +189,7 @@ int score_key(W_Event *ev) {
 			    getting_name  = 0;
 	//		    getting_email = 1;
 			    checking_disc = 1;
-			    strncpy(cur_score.name = new_name, MAX_NAME);
+			    strncpy(cur_score.name, new_name, MAX_NAME);
 			    cur_score.score = score;
 			    new_name[0] = '\0';
 			    nnpos = 0;
@@ -333,6 +340,78 @@ int phone_key(W_Event *ev){
 	return 0;
 }
 
+void load_scores_new() {
+    int i;
+    int hsf;
+    char my_file_name[256], *home;
+
+    if((home = getenv("HOME"))) {
+		snprintf(my_file_name, sizeof(my_file_name)-1, "%s/.xgalscores_new", home);
+		hsf = open(my_file_name, O_RDONLY);
+		if(hsf <0 ) {
+		    printf("Trouble opening high scores file '%s'\n", my_file_name);
+		    for(i=0;i<NUM_MY_SCORES;i++) {
+				my_scores[i].name[0]  = 0;
+				my_scores[i].email[0] = 0;
+				my_scores[i].phone[0] = 0;
+				my_scores[i].score = 0;
+				my_scores[i].level = 0;
+		    }
+		} else {
+		    for(i=0;i<NUM_MY_SCORES;i++) {
+				if(read(hsf, my_scores[i].name, MAX_NAME) < MAX_NAME){
+				    printf("name");
+				    goto error2;
+				}
+				if(read(hsf, my_scores[i].email, MAX_EMAIL) < MAX_EMAIL)
+				    {printf("email");
+				    goto error2;}
+				if(read(hsf, my_scores[i].phone, MAX_PHONE) < MAX_PHONE)
+				 {   
+                                    printf("phone");
+				    goto error2;}
+				if(read(hsf, &my_scores[i].score, sizeof(long)) < sizeof(long))
+                                    {
+					printf("score");
+					goto error2;
+				}		
+				if(read(hsf, &my_scores[i].level, sizeof(long)) < sizeof(long))
+				     {
+					printf("level");
+				    	goto error2;
+                                    }
+
+				my_scores[i].score = ntohl(my_scores[i].score);
+				my_scores[i].level = ntohl(my_scores[i].level);
+		    }
+		}
+		close(hsf);
+    } else {
+		printf("No HOME variable, so no personal score file.\n");
+		for(i=0;i<NUM_MY_SCORES;i++) {
+		    my_scores[i].name[0]  = 0;
+		    my_scores[i].email[0] = 0;
+		    my_scores[i].phone[0] = 0;
+		    my_scores[i].score = 0;
+		    my_scores[i].level = 0;
+		}
+    }
+    return;
+ 
+	error2:
+	    if(i>0)
+		printf("Error reading high scores file '%s'\n", my_file_name);
+	    for(i=0;i<NUM_MY_SCORES;i++) {
+			my_scores[i].name[0]  = 0;
+			my_scores[i].email[0] = 0;
+			my_scores[i].phone[0] = 0;
+			my_scores[i].score = 0;
+			my_scores[i].level = 0;
+	    }
+    	close(hsf);
+}
+
+
 int check_score(int score)
 {
     int i;
@@ -398,75 +477,10 @@ void show_scores()
     }
 }
 
-void load_scores_new() {
-    int i;
-    int hsf;
-    char my_file_name[256], *home;
-
-    if((home = getenv("HOME"))) {
-		snprintf(my_file_name, sizeof(my_file_name)-1, "%s/.xgalscores_new", home);
-		hsf = open(my_file_name, O_RDONLY);
-		if(hsf <0 ) {
-		    printf("Trouble opening high scores file '%s'\n", my_file_name);
-		    for(i=0;i<NUM_MY_SCORES;i++) {
-				my_scores[i].name[0]  = 0;
-				my_scores[i].email[0] = 0;
-				my_scores[i].phone[0] = 0;
-				my_scores[i].score = 0;
-				my_scores[i].level = 0;
-		    }
-		} else {
-		    for(i=0;i<NUM_MY_SCORES;i++) {
-				if(read(hsf, my_scores[i].name, MAX_NAME) < MAX_NAME)
-				    goto error2;
-				
-				if(read(hsf, my_scores[i].email, MAX_EMAIL) < MAX_EMAIL)
-				    goto error2;
-				
-				if(read(hsf, my_scores[i].phone, MAX_PHONE) < MAX_PHONE)
-				    goto error2;
-
-				if(read(hsf, &my_scores[i].score, sizeof(long)) < sizeof(long))
-				    goto error2;
-
-				if(read(hsf, &my_scores[i].level, sizeof(long)) < sizeof(long))
-				    goto error2;
-
-				my_scores[i].score = ntohl(my_scores[i].score);
-				my_scores[i].level = ntohl(my_scores[i].level);
-		    }
-		}
-		close(hsf);
-    } else {
-		printf("No HOME variable, so no personal score file.\n");
-		for(i=0;i<NUM_MY_SCORES;i++) {
-		    my_scores[i].name[0]  = 0;
-		    my_scores[i].email[0] = 0;
-		    my_scores[i].phone[0] = 0;
-		    my_scores[i].score = 0;
-		    my_scores[i].level = 0;
-		}
-    }
-    return;
- 
-	error2:
-	    if(i>0)
-		printf("Error reading high scores file '%s'\n", my_file_name);
-	    for(i=0;i<NUM_MY_SCORES;i++) {
-			my_scores[i].name[0]  = 0;
-			my_scores[i].email[0] = 0;
-			my_scores[i].phone[0] = 0;
-			my_scores[i].score = 0;
-			my_scores[i].level = 0;
-	    }
-    	close(hsf);
-}
-
-
 void print_scores() {
     int i;
     
-    load_scores();
+    load_scores_new();
 #ifndef NO_GLOBAL_SCORES
     printf("\nGlobal High Scores:\n");
     printf("-----------------------------------------------\n");
