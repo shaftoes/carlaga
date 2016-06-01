@@ -195,7 +195,6 @@ int score_key(W_Event *ev) {
 			    nnpos = 0;
 			    pagetimer = 300;
 			    W_ClearWindow(baseWin);
-
 		    	break;
 			case 8:   //backspace
 			case 127: //delete
@@ -450,30 +449,30 @@ void show_scores()
 
     color = W_DarkGrey;
 
-    
+    int top = 90;
 #ifndef NO_GLOBAL_SCORES
-    center_text("Global high scores", 90, W_Yellow);
+    center_text("Global high scores", top, W_Yellow);
     sprintf(buf, "Rank  Name                      Score   Level");
-    center_text(buf, 100, W_Yellow);
-    W_MakeLine(baseWin, WINWIDTH/2-((strlen(buf)*W_Textwidth)/2), 111,
-	       WINWIDTH/2 + ((strlen(buf)*W_Textwidth)/2), 111, W_Red);
+    center_text(buf, top+10, W_Yellow);
+    W_MakeLine(baseWin, WINWIDTH/2-((strlen(buf)*W_Textwidth)/2), top+21,
+	       WINWIDTH/2 + ((strlen(buf)*W_Textwidth)/2), top+21, W_Red);
     for(i=0;i<NUM_GLOBAL_SCORES;i++) {
 	sprintf(buf, "  %2d. %-20s     %7ld %5ld", i+1, 
 		global_scores[i].name, global_scores[i].score,global_scores[i].level);
-	center_text(buf, 112+i*W_Textheight, (i==thisplace ? color : W_Grey));
+	center_text(buf, top+22+i*W_Textheight, (i==thisplace ? color : W_Grey));
     }
 #endif
     
     center_text("Your high scores", 112+NUM_GLOBAL_SCORES*W_Textheight, W_Yellow);
     sprintf(buf, "Rank  Name                      Score   Level");
-    center_text(buf, 112+(NUM_GLOBAL_SCORES+1)*W_Textheight, W_Yellow);
-    W_MakeLine(baseWin, WINWIDTH/2-((strlen(buf)*W_Textwidth)/2), 123+(NUM_GLOBAL_SCORES+1)*W_Textheight,
-	       WINWIDTH/2 + ((strlen(buf)*W_Textwidth)/2), 123+(NUM_GLOBAL_SCORES+1)*W_Textheight, W_Red);
+    center_text(buf, top+22+(NUM_GLOBAL_SCORES+1)*W_Textheight, W_Yellow);
+    W_MakeLine(baseWin, WINWIDTH/2-((strlen(buf)*W_Textwidth)/2), top+33+(NUM_GLOBAL_SCORES+1)*W_Textheight,
+	       WINWIDTH/2 + ((strlen(buf)*W_Textwidth)/2), top+33+(NUM_GLOBAL_SCORES+1)*W_Textheight, W_Red);
+    
     for(i=0;i<NUM_MY_SCORES;i++) {
-	sprintf(buf, "  %2d. %-20s     %7ld %5ld", i+1, 
+		sprintf(buf, "  %2d. %-20s     %7ld %5ld", i+1, 
 		my_scores[i].name, my_scores[i].score,my_scores[i].level);
-	center_text(buf, 124+(NUM_GLOBAL_SCORES+1)*W_Textheight + i*W_Textheight, 
-		    (i==my_thisplace ? color : W_Grey));
+		center_text(buf, top+34+(NUM_GLOBAL_SCORES+1)*W_Textheight + i*W_Textheight, (i==my_thisplace ? color : W_Grey));
     }
 }
 
