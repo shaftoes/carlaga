@@ -205,8 +205,8 @@ void do_title()
     switch (title_page) {
         case 0:
             //center_text("Copyright (c) 1995-1998   Joe Rumsey", ty, W_Green); ty+= W_Textheight;
-            center_text("Hi Brendan", ty, W_Green); ty+= 2*W_Textheight;
-            center_text("XGalaga: Hyperspace 0.9", ty, W_Green); ty+= W_Textheight;
+            //center_text("Hi Brendan", ty, W_Green); ty+= 2*W_Textheight;
+            //center_text("XGalaga: Hyperspace 0.9", ty, W_Green); ty+= W_Textheight;
             //show_help();
             //show_credits();
 	       break;
@@ -218,8 +218,8 @@ void do_title()
     }
 //  if (js_device){
 
-    center_text("Press k for keyboard control, m for mouse", WINHEIGHT - 2*W_Textheight, W_Yellow);
-    center_text("Or q to quit", WINHEIGHT - W_Textheight, W_Yellow);
+    //center_text("Press k for keyboard control, m for mouse", WINHEIGHT - 2*W_Textheight, W_Yellow);
+    //center_text("Or q to quit", WINHEIGHT - W_Textheight, W_Yellow);
     undo_credits();     // erase with painting black
 
     pagetimer--;

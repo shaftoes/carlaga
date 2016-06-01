@@ -80,9 +80,9 @@ xgal_exit(int v)
 static void print_usage()
 {
 #ifdef SOUND 
-#define PRINT_SOUND	"-nosound             Turn sound OFF\n"
+#define PRINT_SOUND "-nosound             Turn sound OFF\n"
 #else
-#define PRINT_SOUND	""
+#define PRINT_SOUND ""
 #endif
 
     printf("\
@@ -114,7 +114,7 @@ p - pauses\n\
 q - end this game\n\
 b - Toggle buffering (flicker vs. speed.)\n\
 alt + enter - Toggle fullscreen - window\n", VERSION,
-	PRINT_SOUND
+    PRINT_SOUND
            );
 }
 
@@ -197,21 +197,21 @@ static void do_stars()
             W_DrawPoint(baseWin, stars[i].x, stars[i].y, stars[i].color);
         }
 #ifdef SHOW_SHIELD_BAR
-	    if ((plshield > 0) || (shieldsleft > 0)) { 
-		int shieldcount = 0;
-		int total_shields = (plshield + shieldsleft) * 19 / SHIELDTIME + 1;
-		while (total_shields > 0) {
-			shieldcount++;
-			total_shields -= 19;
-			W_DrawImage(baseWin, WINWIDTH - 20 * shieldcount, 0, 0, shieldImage, W_Cyan);
-		}
-		while (total_shields < 0) {
-			int column;
-			column = WINWIDTH - 20 * shieldcount - total_shields++;
-			W_MakeLine(baseWin, column, 0, column, 20, W_Black);
-			W_MakeLine(baseWin, column - 1, 0, column - 1, 20, W_Black);
-		}
-       	    }
+        if ((plshield > 0) || (shieldsleft > 0)) { 
+        int shieldcount = 0;
+        int total_shields = (plshield + shieldsleft) * 19 / SHIELDTIME + 1;
+        while (total_shields > 0) {
+            shieldcount++;
+            total_shields -= 19;
+            W_DrawImage(baseWin, WINWIDTH - 20 * shieldcount, 0, 0, shieldImage, W_Cyan);
+        }
+        while (total_shields < 0) {
+            int column;
+            column = WINWIDTH - 20 * shieldcount - total_shields++;
+            W_MakeLine(baseWin, column, 0, column, 20, W_Black);
+            W_MakeLine(baseWin, column - 1, 0, column - 1, 20, W_Black);
+        }
+            }
 #endif /* SHOW_SHIELD_BAR */
 
 
@@ -219,27 +219,27 @@ static void do_stars()
     if(starspeed != 1) {
         char buf[20];
 #ifndef ORIGINAL_XGALAGA
-	int y;
+    int y;
 #endif
     
         drewlevel = 1;
         sprintf(buf, "LEVEL %d", level+1);
 #ifndef ORIGINAL_XGALAGA
-	y = WINHEIGHT/2-W_BigTextheight/2;
+    y = WINHEIGHT/2-W_BigTextheight/2;
 #endif
         W_MaskText(baseWin, WINWIDTH/2 - (W_StringWidth(buf, W_BigFont)/2), WINHEIGHT/2-W_BigTextheight/2, W_Red, buf, strlen(buf), W_BigFont);
 #ifndef ORIGINAL_XGALAGA
-	if (shots > 0) {
-		int x = WINWIDTH/2 - 14 * W_Textwidth;
-		y += W_BigTextheight + 20;
-	
-		sprintf(buf, "Torps: %d  Hits: %d", shots, hits);
-		W_MaskText(baseWin, x, y, W_Yellow, buf, strlen(buf), W_RegularFont);
-	
-		x += 23 * W_Textwidth;
-		sprintf(buf, "(%d%%)", 100 * hits / shots);
-		W_MaskText(baseWin, x, y, W_Green, buf, strlen(buf), W_RegularFont);
-	}
+    if (shots > 0) {
+        int x = WINWIDTH/2 - 14 * W_Textwidth;
+        y += W_BigTextheight + 20;
+    
+        sprintf(buf, "Torps: %d  Hits: %d", shots, hits);
+        W_MaskText(baseWin, x, y, W_Yellow, buf, strlen(buf), W_RegularFont);
+    
+        x += 23 * W_Textwidth;
+        sprintf(buf, "(%d%%)", 100 * hits / shots);
+        W_MaskText(baseWin, x, y, W_Green, buf, strlen(buf), W_RegularFont);
+    }
 #endif
     }
 }
@@ -275,8 +275,8 @@ static void init_aliens(int level)
     metaLevel = 1;
     if(read_level(level) <= 0)
     {
-	fprintf(stderr, "Error reading level %d\n", level);
-	exit(0);
+    fprintf(stderr, "Error reading level %d\n", level);
+    exit(0);
     }
 
     for(i=0;i<MAXALIENS;i++) {
@@ -395,9 +395,9 @@ static void do_enter(int i)
         if(aliens[i].steer <= 0) {
             aliens[i].path_pos++;
             enter_path_dir(aliens[i].path, aliens[i].path_pos, &aliens[i].dir, &aliens[i].steer);
-	    if(metaLevel > 1)
-		aliens[i].steer = aliens[i].steer / (1 + ((metaLevel - 1) * .5));
-	    /*aliens[i].steer -= ((metaLevel - 1) * (aliens[i].steer / 3));*/
+        if(metaLevel > 1)
+        aliens[i].steer = aliens[i].steer / (1 + ((metaLevel - 1) * .5));
+        /*aliens[i].steer -= ((metaLevel - 1) * (aliens[i].steer / 3));*/
 
             if(aliens[i].dir < 0) {
                 aliens[i].path = -1;
@@ -441,27 +441,27 @@ static void do_enter(int i)
             else
                 aliens[i].dir = 12;
         } else {
-	    if(convoy_y_pos(i) < aliens[i].y) {
-		if(diffx < 4 + (metaLevel * 2)) {
-		    aliens[i].x = convoy_x_pos(i);
-		    aliens[i].dir = 0;
-		} else {
-		    if(convoy_x_pos(i) > aliens[i].x)
-			aliens[i].dir = 2;
-		    else
-			aliens[i].dir = 14;
-		}
-	    } else {
-		if(diffx < 4 + (metaLevel * 2)) {
-		    aliens[i].x = convoy_x_pos(i);
-		    aliens[i].dir = 8;
-		} else {
-		    if(convoy_x_pos(i) > aliens[i].x)
-			aliens[i].dir = 6;
-		    else
-			aliens[i].dir = 10;
-		}
-	    }
+        if(convoy_y_pos(i) < aliens[i].y) {
+        if(diffx < 4 + (metaLevel * 2)) {
+            aliens[i].x = convoy_x_pos(i);
+            aliens[i].dir = 0;
+        } else {
+            if(convoy_x_pos(i) > aliens[i].x)
+            aliens[i].dir = 2;
+            else
+            aliens[i].dir = 14;
+        }
+        } else {
+        if(diffx < 4 + (metaLevel * 2)) {
+            aliens[i].x = convoy_x_pos(i);
+            aliens[i].dir = 8;
+        } else {
+            if(convoy_x_pos(i) > aliens[i].x)
+            aliens[i].dir = 6;
+            else
+            aliens[i].dir = 10;
+        }
+        }
         }
         aliens[i].x += moves[aliens[i].dir][0] + metaLevel * moves[aliens[i].dir][0]/2;
         aliens[i].y += moves[aliens[i].dir][1] + metaLevel * moves[aliens[i].dir][1]/2;
@@ -835,15 +835,14 @@ static void do_player(int mx, int my, int but){
         while(W_EventsPending()) {
             W_NextEvent(&wev);
         
-    	    if(gameOver)
-    	      mouseControl = 1;
-
+            if(gameOver)
+              mouseControl = 1;
                 switch(wev.type) {
                     case W_EV_KEY:
                         if(score_key(&wev))
                             continue;
-			if(disclaimer_key(&wev))
-		            continue;
+                        if(disclaimer_key(&wev))
+                            continue;
                         if(email_key(&wev))
                             continue;
                         if(phone_key(&wev))
@@ -880,13 +879,13 @@ static void do_player(int mx, int my, int but){
                                 return;     /* this key must not start the game */
                                 break;
     #endif
-            		        default:
+                            default:
             /*printf ("1keyevent %d\n", wev.key); */
                                 return;     /* unhandled key must not cause any action */
-            		            break;
+                                break;
                         }
                         if(mouseControl < 2)
-                            mouseControl = 0;	
+                            mouseControl = 0;   
 
                     case W_EV_BUTTON:
                         if(!getting_name || !getting_email || !getting_phone) {
@@ -898,10 +897,10 @@ static void do_player(int mx, int my, int but){
                             movespeed = MINSPEED;
                             ships=2;
     #ifdef ACTIVATED_SHIELD
-    		                shieldsleft = STARTSHIELDS;
-    		                shieldon = 0;
+                            shieldsleft = STARTSHIELDS;
+                            shieldon = 0;
     #else
-    		                shieldsleft = 0;
+                            shieldsleft = 0;
     #endif
                             level=startLevel;  /* change made here */
                             init_aliens(level);
@@ -914,9 +913,9 @@ static void do_player(int mx, int my, int but){
                         }
                         break;
                     case W_EV_EXPOSE:
-            	    	if (wev.Window == shellWin)
-            		      draw_score();
-            		    break;
+                        if (wev.Window == shellWin)
+                          draw_score();
+                        break;
                     default:
                         /*printf ("2keyevent %d\n", wev.key);*/
                         break;
@@ -942,12 +941,12 @@ static void do_player(int mx, int my, int but){
                 keys &= ~(FIREKEY);
                 break;
 #ifdef ACTIVATED_SHIELD
-	    case 'x':
+        case 'x':
             case 256+'x':
-		shieldsleft += plshield;
-		plshield = 0;
-		shieldon = 0;
-		break;
+        shieldsleft += plshield;
+        plshield = 0;
+        shieldon = 0;
+        break;
 #endif
             }
             break;
@@ -974,12 +973,12 @@ static void do_player(int mx, int my, int but){
                 W_GrabPointer(baseWin);
                 break;
 #ifdef ACTIVATED_SHIELD
-	    case 'x':
+        case 'x':
             case 256+'x':
-		plshield += shieldsleft;
-		shieldsleft = 0;
-		shieldon = 1;
-		break;
+        plshield += shieldsleft;
+        shieldsleft = 0;
+        shieldon = 1;
+        break;
 #endif
             case 'q':
             case 256+'q':       //369:
@@ -1069,9 +1068,9 @@ static void do_player(int mx, int my, int but){
                 break;
             }
         case W_EV_EXPOSE:
-	    if (wev.Window == shellWin)
-	    	draw_score();
-	    break;
+        if (wev.Window == shellWin)
+            draw_score();
+        break;
         }
     }
 
@@ -1079,7 +1078,7 @@ static void do_player(int mx, int my, int but){
         torpok--;
 
         if((!mouseControl && ! js_device) ||
-	   (js_device && mx == plx && but == 0)) {
+       (js_device && mx == plx && but == 0)) {
             if(keys & LEFTKEY)
                 mx = 0;
             else if(keys & RIGHTKEY)
@@ -1102,6 +1101,7 @@ static void do_player(int mx, int my, int but){
                     if(check_score(score) && !(getting_phone || getting_email)) {
 #ifdef USE_REAL_NAMES
                         add_score(getUsersFullName(), score);
+
                         title_page = 1; pagetimer = 300;
 #else
                         getting_name = 1;
@@ -1112,41 +1112,41 @@ static void do_player(int mx, int my, int but){
                     ships--;
                     maxtorps--;
                     if (maxtorps < MINTORPS)
-                    	maxtorps = MINTORPS;
+                        maxtorps = MINTORPS;
                     switch (weapon)
                     {
-                    	case SINGLESHOT:
-                    		if (maxtorps < 3)
-                    		{
-                    			maxtorps = 3;
-                    			weapon = SINGLESHOT;
-                    		}
-                    		break;
-                    	case DOUBLESHOT:
-	                    	if (maxtorps < 4)
-                    		{
-                    			maxtorps = 4;
-                    		}
-        					break;
-                   		case SPREADSHOT:
-                    		if (maxtorps < 5)
-                    		{
-                    			maxtorps = 5;
-                    		}
-                    		break;
-						case TRIPLESHOT:
-							if (maxtorps < 6)
-                    		{
-                    			maxtorps = 6;
-                    		}
-                    		break;
-                    	case MACHINEGUN:
-                    		if (maxtorps < 3)
-                    		{
-                    			maxtorps = 3;
-                    		}
-                    		break;
-		}
+                        case SINGLESHOT:
+                            if (maxtorps < 3)
+                            {
+                                maxtorps = 3;
+                                weapon = SINGLESHOT;
+                            }
+                            break;
+                        case DOUBLESHOT:
+                            if (maxtorps < 4)
+                            {
+                                maxtorps = 4;
+                            }
+                            break;
+                        case SPREADSHOT:
+                            if (maxtorps < 5)
+                            {
+                                maxtorps = 5;
+                            }
+                            break;
+                        case TRIPLESHOT:
+                            if (maxtorps < 6)
+                            {
+                                maxtorps = 6;
+                            }
+                            break;
+                        case MACHINEGUN:
+                            if (maxtorps < 3)
+                            {
+                                maxtorps = 3;
+                            }
+                            break;
+        }
 #else
                     ships--;
                     maxtorps = MINTORPS;
@@ -1166,13 +1166,13 @@ static void do_player(int mx, int my, int but){
             case SINGLESHOT:
                 if(numtorps < maxtorps)
                     new_torp(plx, WINHEIGHT - playerShip->height, 0, -TORPSPEED);
-		    torpok = TORPDELAY;
+            torpok = TORPDELAY;
                 break;
             case DOUBLESHOT:
                 if(numtorps < maxtorps-1) {
                     new_torp(plx-5, WINHEIGHT - playerShip->height, 0, -TORPSPEED);
                     new_torp(plx+5, WINHEIGHT - playerShip->height, 0, -TORPSPEED);
-		    torpok = TORPDELAY;
+            torpok = TORPDELAY;
                 }
                 break;
             case TRIPLESHOT:
@@ -1180,61 +1180,61 @@ static void do_player(int mx, int my, int but){
                     new_torp(plx-5, WINHEIGHT - playerShip->height, -2, 1-TORPSPEED);
                     new_torp(plx,   WINHEIGHT - playerShip->height, 0,   -TORPSPEED);
                     new_torp(plx+5, WINHEIGHT - playerShip->height, 2, 1-TORPSPEED);
-		    torpok = TORPDELAY;
+            torpok = TORPDELAY;
                 }
                 break;
 #ifdef ENABLE_SPREAD_SHOT
             case SPREADSHOT:
-            	if (numtorps == 0)
+                if (numtorps == 0)
                 {
-			if ((maxtorps % 2) == 1)
-				new_torp(plx, WINHEIGHT - playerShip->height, 0, -TORPSPEED*1.15);
-			else
-			{
-				new_torp(plx - 5, WINHEIGHT - playerShip->height, 0, -TORPSPEED*1.15);
-				new_torp(plx + 5, WINHEIGHT - playerShip->height, 0, -TORPSPEED*1.15);
-			}
-			if (maxtorps > 2)
-			{
-				new_torp(plx, WINHEIGHT - playerShip->height - 15, -2, -TORPSPEED*1.15);
-				new_torp(plx, WINHEIGHT - playerShip->height - 15, 2, -TORPSPEED*1.15);
-			}
-			if (maxtorps > 4)
-			{
-				new_torp(plx, WINHEIGHT - playerShip->height - 25, -4, -TORPSPEED*1.15);
-				new_torp(plx, WINHEIGHT - playerShip->height - 25, 4, -TORPSPEED*1.15);
-			}
-			if (maxtorps > 6)
-			{
-				new_torp(plx, WINHEIGHT - playerShip->height - 35, -6, -TORPSPEED*1.15);
-				new_torp(plx, WINHEIGHT - playerShip->height - 35, 6, -TORPSPEED*1.15);
-			}
-			if (maxtorps > 8)
-			{
-				new_torp(plx, WINHEIGHT - playerShip->height - 50, -8, -TORPSPEED*1.15);    
-				new_torp(plx, WINHEIGHT - playerShip->height - 50, 8, -TORPSPEED*1.15);
-			}
-			if (maxtorps > 10)
-			{
-				new_torp(plx, WINHEIGHT - playerShip->height - 60, -10, -TORPSPEED*1.15);
-				new_torp(plx, WINHEIGHT - playerShip->height - 60, 10, -TORPSPEED*1.15);
+            if ((maxtorps % 2) == 1)
+                new_torp(plx, WINHEIGHT - playerShip->height, 0, -TORPSPEED*1.15);
+            else
+            {
+                new_torp(plx - 5, WINHEIGHT - playerShip->height, 0, -TORPSPEED*1.15);
+                new_torp(plx + 5, WINHEIGHT - playerShip->height, 0, -TORPSPEED*1.15);
+            }
+            if (maxtorps > 2)
+            {
+                new_torp(plx, WINHEIGHT - playerShip->height - 15, -2, -TORPSPEED*1.15);
+                new_torp(plx, WINHEIGHT - playerShip->height - 15, 2, -TORPSPEED*1.15);
+            }
+            if (maxtorps > 4)
+            {
+                new_torp(plx, WINHEIGHT - playerShip->height - 25, -4, -TORPSPEED*1.15);
+                new_torp(plx, WINHEIGHT - playerShip->height - 25, 4, -TORPSPEED*1.15);
+            }
+            if (maxtorps > 6)
+            {
+                new_torp(plx, WINHEIGHT - playerShip->height - 35, -6, -TORPSPEED*1.15);
+                new_torp(plx, WINHEIGHT - playerShip->height - 35, 6, -TORPSPEED*1.15);
+            }
+            if (maxtorps > 8)
+            {
+                new_torp(plx, WINHEIGHT - playerShip->height - 50, -8, -TORPSPEED*1.15);    
+                new_torp(plx, WINHEIGHT - playerShip->height - 50, 8, -TORPSPEED*1.15);
+            }
+            if (maxtorps > 10)
+            {
+                new_torp(plx, WINHEIGHT - playerShip->height - 60, -10, -TORPSPEED*1.15);
+                new_torp(plx, WINHEIGHT - playerShip->height - 60, 10, -TORPSPEED*1.15);
                         }
                         torpok = TORPDELAY;
                  }
-		 break;
+         break;
 #endif /* ENABLE_SPREAD_SHOT */
 #ifdef ENABLE_MACHINE_GUN
             case MACHINEGUN:
                  if(numtorps < maxtorps)
                  {
-			shotside = (shotside == -15) ? 15 : -15;
-			new_torp(plx + shotside, WINHEIGHT - playerShip->height, 0, -TORPSPEED * 1.3);
-			torpok = TORPDELAY - 2;
-		}
-		break;
+            shotside = (shotside == -15) ? 15 : -15;
+            new_torp(plx + shotside, WINHEIGHT - playerShip->height, 0, -TORPSPEED * 1.3);
+            torpok = TORPDELAY - 2;
+        }
+        break;
 #endif /* ENABLE_MACHINE_GUN */
-	    }
-	}
+        }
+    }
 
 
         if(!but)
@@ -1247,9 +1247,9 @@ static void do_player(int mx, int my, int but){
 #ifdef ENABLE_SHIP_WRAP
 
         if(plx < 10)
-        	plx=WINWIDTH - 10;
+            plx=WINWIDTH - 10;
         if(plx > WINWIDTH - 10)
-			plx=10;
+            plx=10;
 #else
   
     
@@ -1304,7 +1304,7 @@ char  **argv;
             } else if (strcmp(argv[ac], "-nosound") == 0) {
                 playSounds = 0;
 #endif
-	/* '-level' option defined here */
+    /* '-level' option defined here */
             } else if (strcmp(argv[ac], "-level") == 0 && (ac+1 < argc) 
                        && atoi(argv[ac+1]) >= 1) 
             {
@@ -1340,7 +1340,7 @@ char  **argv;
     backColor = W_Black;
     WINHEIGHT -= (W_Textheight+1);
     shellWin = W_MakeWindow("XGalaga", 0, 0, WINWIDTH, WINHEIGHT + W_Textheight+1, 0, "tiny", 0, W_White);
-    baseWin = W_MakeWindow("", 0, W_Textheight+1, WINWIDTH, WINHEIGHT, shellWin, "tiny", 0, W_White);
+    baseWin  = W_MakeWindow("", 0, W_Textheight+1, WINWIDTH, WINHEIGHT, shellWin, "tiny", 0, W_White);
     W_Buffer(shellWin, 0);
     W_MapWindow(shellWin);
     W_MapWindow(baseWin);
@@ -1364,7 +1364,7 @@ char  **argv;
 
     level=startLevel;   /* change made here */
 
-    load_scores();
+    load_scores_new();
     init_titles();
     init_player();
     init_stars();
@@ -1386,16 +1386,16 @@ char  **argv;
     while(1) {
         counter++;
 
-	/* For the benefit of unbuffered mode, the most important things are
-	 * erased/redrawn closest together so they spend the least time blanked.
-	 * player, aliens and etorps are most important for game play.
-	 * pause, title and name are important in their modes and aren't done
-	 * otherwise.
-	 *
-	 * The title, name, pause and score "extra ship" want to overlay
-	 * everything else drawn, so they come last.
-	 */
-	undo_stars();
+    /* For the benefit of unbuffered mode, the most important things are
+     * erased/redrawn closest together so they spend the least time blanked.
+     * player, aliens and etorps are most important for game play.
+     * pause, title and name are important in their modes and aren't done
+     * otherwise.
+     *
+     * The title, name, pause and score "extra ship" want to overlay
+     * everything else drawn, so they come last.
+     */
+    undo_stars();
         undo_explosions();
         undo_prizes();
         undo_torps();
@@ -1417,28 +1417,28 @@ char  **argv;
         do_torps();
         do_prizes();
         do_explosions();
- 	do_stars();
+    do_stars();
         do_score();
         if(gameOver) { 
             do_title(); 
-            if(getting_name)  do_name();
+            if(getting_name)   do_name();
             if(checking_disc)  do_disclaimer();
-            if(getting_email) do_email();
-            if(getting_phone) do_phone(); 
+            if(getting_email)  do_email();
+            if(getting_phone)  do_phone(); 
         }
 
         if(paused) do_pause();
 
         W_DisplayBuffer(baseWin);
 
-	/* This is an XSync style round trip to the server with the bonus of
-	 * getting the mouse position.
-	 * If the server can't draw at the UTIMER frame rate then this will be
-	 * the only delay in the loop.
-	 */
-	W_GetMouse(baseWin, &mx, &my, &but);
+    /* This is an XSync style round trip to the server with the bonus of
+     * getting the mouse position.
+     * If the server can't draw at the UTIMER frame rate then this will be
+     * the only delay in the loop.
+     */
+    W_GetMouse(baseWin, &mx, &my, &but);
 #ifdef __linux__
-	do_joystick(&mx, &my, &but);
+    do_joystick(&mx, &my, &but);
 #endif
         do_framerate();
 
